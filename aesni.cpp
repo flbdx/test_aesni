@@ -131,7 +131,7 @@ namespace AESNI {
         /*
          * AES-256
          * Generate the 1st part of the next 256 bits of round keys data using the previous 256 bits
-         * Called alteranating with AES_256_key_exp_2
+         * Called alternating with AES_256_key_exp_2
          */
         template<const int rcon>
         INLINE
@@ -146,7 +146,7 @@ namespace AESNI {
         /*
          * AES-256
          * Generate the 2nd part of next 256 bits of round keys data using the previous 256 bits
-         * Called alteranating with AES_256_key_exp_1
+         * Called alternating with AES_256_key_exp_1
          */
         INLINE
         void AES_256_key_exp_2(__m128i k0, __m128i k1, __m128i &k2) {
