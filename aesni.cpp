@@ -50,8 +50,7 @@ namespace AESNI {
         void AES_128_key_exp(__m128i k0, __m128i &k1) {
             __m128i core = _mm_shuffle_epi32(_mm_aeskeygenassist_si128(k0, rcon), _MM_SHUFFLE(3,3,3,3));
             k1 = _mm_xor_si128(k0, _mm_slli_si128(k0, 4));
-            k1 = _mm_xor_si128(k1, _mm_slli_si128(k0, 8));
-            k1 = _mm_xor_si128(k1, _mm_slli_si128(k0, 12));
+            k1 = _mm_xor_si128(k1, _mm_slli_si128(k1, 8));
             k1 = _mm_xor_si128(k1, core);
         }
         
@@ -69,14 +68,15 @@ namespace AESNI {
         void AES_192_key_exp_1(__m128i k0, __m128i &k1, __m128i &k2) {
             __m128i core = _mm_shuffle_epi32(_mm_aeskeygenassist_si128(k1, rcon), _MM_SHUFFLE(1,1,1,1));
             k2 = _mm_xor_si128(k0, _mm_slli_si128(k0, 4));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k0, 8));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k0, 12));
+            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 8));
+            
+            __m128i tmp = _mm_slli_si128(k1, 8);
+            tmp = _mm_xor_si128(tmp, _mm_slli_si128(tmp, 4));
+            
             k2 = _mm_xor_si128(k2, core);
             k2 = _mm_shuffle_epi32(k2, _MM_SHUFFLE(1, 0, 3, 2)); // rotate, bits[64:128] are in position
             k1 = _mm_blend_epi32(k1, k2, 0+0+4+8); // write bits[0:64]
             
-            __m128i tmp = _mm_slli_si128(k1, 8);
-            tmp = _mm_xor_si128(tmp, _mm_slli_si128(tmp, 4));
             tmp = _mm_xor_si128(tmp, _mm_shuffle_epi32(k2, _MM_SHUFFLE(1,1,1,1)));
             k2 = _mm_blend_epi32(k2, tmp, 0+0+4+8); // blend bits[128:192]
         }
@@ -98,12 +98,13 @@ namespace AESNI {
             k2 = _mm_blend_epi32(k0, k1, 1+2+0+0);
             k2 = _mm_shuffle_epi32(k2, _MM_SHUFFLE(1,0,3,2)); // rotate
             k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 4));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 4));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 4));
-            k2 = _mm_xor_si128(k2, core); // write bits[0:128]
+            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 8));
             
             k3 = _mm_srli_si128(k1, 8);
             k3 = _mm_xor_si128(k3, _mm_slli_si128(k3, 4));
+            
+            k2 = _mm_xor_si128(k2, core); // write bits[0:128]
+            
             k3 = _mm_xor_si128(k3, _mm_shuffle_epi32(k2, _MM_SHUFFLE(3,3,3,3))); // this also override k3[64:128] with dirty data
         }
         
@@ -123,8 +124,7 @@ namespace AESNI {
             k2 = _mm_blend_epi32(k0, k1, 1+2+0+0);
             k2 = _mm_shuffle_epi32(k2, _MM_SHUFFLE(1,0,3,2)); // rotate
             k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 4));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 4));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 4));
+            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 8));
             k2 = _mm_xor_si128(k2, core);
         }
         
@@ -138,8 +138,7 @@ namespace AESNI {
         void AES_256_key_exp_1(__m128i k0, __m128i k1, __m128i &k2) {
             __m128i core = _mm_shuffle_epi32(_mm_aeskeygenassist_si128(k1, rcon), _MM_SHUFFLE(3,3,3,3));
             k2 = _mm_xor_si128(k0, _mm_slli_si128(k0, 4));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k0, 8));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k0, 12));
+            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 8));
             k2 = _mm_xor_si128(k2, core);
         }
         
@@ -152,8 +151,7 @@ namespace AESNI {
         void AES_256_key_exp_2(__m128i k0, __m128i k1, __m128i &k2) {
             __m128i sboxed = _mm_shuffle_epi32(_mm_aeskeygenassist_si128(k1, 0), _MM_SHUFFLE(2,2,2,2));
             k2 = _mm_xor_si128(k0, _mm_slli_si128(k0, 4));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k0, 8));
-            k2 = _mm_xor_si128(k2, _mm_slli_si128(k0, 12));
+            k2 = _mm_xor_si128(k2, _mm_slli_si128(k2, 8));
             k2 = _mm_xor_si128(k2, sboxed);
         }
         
